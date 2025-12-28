@@ -2,22 +2,30 @@ local function showValidationError(message)
     lib.notify({
         title = 'Appel',
         description = message,
-        type = 'error'
+        type = 'error',
+        icon = 'nui://call-system/bipper.png'
     })
 end
 
 local function openCallDialog()
     local input = lib.inputDialog('Nouvel appel', {
         {
-            type = 'input',
-            label = 'Description',
-            required = true
+            type = 'select',
+            label = 'Type de service',
+            description = 'Sélectionnez le type de service',
+            required = true,
+            options = {
+                { value = 'police', label = "Forces de l'ordre" },
+                { value = 'ems',    label = 'Service de secours' },
+            }
         },
         {
-            type = 'number',
-            label = 'Position',
-            description = 'Uniquement des chiffres',
-            required = true
+            type = 'textarea',
+            label = 'Description',
+            description = 'Décrivez la situation',
+            required = true,
+            min = 5,
+            max = 500
         }
     })
 
@@ -25,27 +33,23 @@ local function openCallDialog()
         return
     end
 
-    local description = input[1]
-    local position = input[2]
+    local serviceType = input[1]
+    local description = input[2]
 
     if type(description) ~= 'string' or description == '' then
         showValidationError('La description est obligatoire.')
         return
     end
 
-    if type(position) ~= 'number' then
-        showValidationError('La position doit contenir uniquement des chiffres.')
-        return
-    end
+    -- Récupération automatique de la position du joueur
+    local ped = PlayerPedId()
+    local coords = GetEntityCoords(ped)
 
-    if position < 0 or position % 1 ~= 0 then
-        showValidationError('La position doit contenir uniquement des chiffres.')
-        return
-    end
+    -- Récupération du nom de rue
+    local streetHash = GetStreetNameAtCoord(coords.x, coords.y, coords.z)
+    local streetName = GetStreetNameFromHashKey(streetHash)
 
-    local coords = GetEntityCoords(PlayerPedId())
-
-    TriggerServerEvent('call-system:submitCall', description, position, {
+    TriggerServerEvent('call-system:submitCall', serviceType, description, streetName, {
         x = coords.x,
         y = coords.y,
         z = coords.z
@@ -59,10 +63,11 @@ local activeBlip = nil
 
 local function setCallRoute()
     if not latestCall then
-        lib.notify({
+        lib. notify({
             title = 'Appel',
             description = 'Aucun appel actif.',
-            type = 'error'
+            type = 'error',
+            icon = 'nui://call-system/bipper.png'
         })
         return
     end
@@ -88,30 +93,34 @@ local function setCallRoute()
     lib.notify({
         title = 'Appel',
         description = 'Trajet GPS défini.',
-        type = 'success'
+        type = 'success',
+        icon = 'nui://call-system/bipper.png'
     })
 end
 
 RegisterCommand('call-system:setroute', setCallRoute, false)
 RegisterKeyMapping('call-system:setroute', 'Définir le trajet GPS pour le dernier appel', 'keyboard', 'Y')
 
-RegisterNetEvent('call-system:showAlert', function(description, position, coords)
-    local targetCoords = vector3(coords.x, coords.y, coords.z)
+RegisterNetEvent('call-system:showAlert', function(serviceType, description, streetName, coords)
+    local targetCoords = vector3(coords. x, coords.y, coords. z)
     local playerCoords = GetEntityCoords(PlayerPedId())
     local distance = #(playerCoords - targetCoords)
     local distanceText = string.format('Distance : %d m', math.floor(distance))
-    local message = string.format('%s\n%s\nPosition : %s\nAppuyez sur Y pour GPS', description, distanceText, position)
+
+    local serviceLabel = serviceType == 'police' and "~b~Forces de l'ordre~w~" or "~r~Service de secours~w~"
+    local message = string.format('[%s]\n%s\n%s\nPosition : %s\nAppuyez sur Y pour GPS', serviceLabel, description, distanceText, streetName)
 
     latestCall = {
+        serviceType = serviceType,
         description = description,
-        position = position,
+        streetName = streetName,
         coords = coords
     }
 
     exports.bulletin:Send({
         message = message,
-        timeout = 6000,
-        theme = 'info',
+        timeout = 15000,
+        theme = 'warning',
         position = 'bottomleft'
     })
 end)

@@ -1,13 +1,13 @@
-RegisterNetEvent('call-system:submitCall', function(description, position, coords)
+RegisterNetEvent('call-system:submitCall', function(serviceType, description, streetName, coords)
+    if type(serviceType) ~= 'string' or (serviceType ~= 'police' and serviceType ~= 'ems') then
+        return
+    end
+
     if type(description) ~= 'string' or description == '' then
         return
     end
 
-    if type(position) ~= 'number' then
-        return
-    end
-
-    if position < 0 or position % 1 ~= 0 then
+    if type(streetName) ~= 'string' or streetName == '' then
         return
     end
 
@@ -15,9 +15,9 @@ RegisterNetEvent('call-system:submitCall', function(description, position, coord
         return
     end
 
-    if type(coords.x) ~= 'number' or type(coords.y) ~= 'number' or type(coords.z) ~= 'number' then
+    if type(coords.x) ~= 'number' or type(coords.y) ~= 'number' or type(coords. z) ~= 'number' then
         return
     end
 
-    TriggerClientEvent('call-system:showAlert', -1, description, position, coords)
+    TriggerClientEvent('call-system:showAlert', -1, serviceType, description, streetName, coords)
 end)
