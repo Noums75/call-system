@@ -1,9 +1,12 @@
+local bulletinIcon = 'nui://call-system/bipper.png'
+local gpsSetKey = string.upper(GetConvar('call_system_gps_key', 'Y'))
+
 local function showValidationError(message)
     lib.notify({
         title = 'Appel',
         description = message,
         type = 'error',
-        icon = 'nui://call-system/bipper.png'
+        icon = bulletinIcon
     })
 end
 
@@ -63,11 +66,11 @@ local activeBlip = nil
 
 local function setCallRoute()
     if not latestCall then
-        lib. notify({
+        lib.notify({
             title = 'Appel',
             description = 'Aucun appel actif.',
             type = 'error',
-            icon = 'nui://call-system/bipper.png'
+            icon = bulletinIcon
         })
         return
     end
@@ -94,21 +97,26 @@ local function setCallRoute()
         title = 'Appel',
         description = 'Trajet GPS défini.',
         type = 'success',
-        icon = 'nui://call-system/bipper.png'
+        icon = bulletinIcon
     })
 end
 
-RegisterCommand('call-system:setroute', setCallRoute, false)
-RegisterKeyMapping('call-system:setroute', 'Définir le trajet GPS pour le dernier appel', 'keyboard', 'Y')
+-- Keybind uniquement, aucune commande utilisée pour définir le GPS.
+lib.addKeybind({
+    name = 'call-system:setroute',
+    description = 'Définir le trajet GPS pour le dernier appel',
+    defaultKey = gpsSetKey,
+    onPressed = setCallRoute
+})
 
 RegisterNetEvent('call-system:showAlert', function(serviceType, description, streetName, coords)
-    local targetCoords = vector3(coords. x, coords.y, coords. z)
+    local targetCoords = vector3(coords.x, coords.y, coords.z)
     local playerCoords = GetEntityCoords(PlayerPedId())
     local distance = #(playerCoords - targetCoords)
     local distanceText = string.format('Distance : %d m', math.floor(distance))
 
     local serviceLabel = serviceType == 'police' and "~b~Forces de l'ordre~w~" or "~r~Service de secours~w~"
-    local message = string.format('[%s]\n%s\n%s\nPosition : %s\nAppuyez sur Y pour GPS', serviceLabel, description, distanceText, streetName)
+    local message = string.format('[%s]\n%s\n%s\nPosition : %s\nAppuyez sur %s pour GPS', serviceLabel, description, distanceText, streetName, gpsSetKey)
 
     latestCall = {
         serviceType = serviceType,
@@ -121,6 +129,7 @@ RegisterNetEvent('call-system:showAlert', function(serviceType, description, str
         message = message,
         timeout = 15000,
         theme = 'warning',
-        position = 'bottomleft'
+        position = 'bottomleft',
+        icon = bulletinIcon
     })
 end)
