@@ -9,8 +9,6 @@ Un système d'appel d'urgence moderne et intuitif pour FiveM, permettant aux jou
 - [Utilisation](#-utilisation)
 - [Build de l'UI](#️-build-de-lui)
 - [Compatibilité](#-compatibilité)
-- [Support](#-support)
-- [Licence](#-licence)
 
 ## ✨ Fonctionnalités
 - 🎯 Menu interactif (TypeScript/NUI) pour créer des appels d'urgence
@@ -64,10 +62,3 @@ npm run build
 - ✅ FiveM Build 2802+
 - ✅ Lua 5.4
 - ✅ bulletin (dernière version recommandée)
-
-## 🤝 Support
-- Ouvrez une issue sur le repository si vous rencontrez un problème ou souhaitez proposer une amélioration.
-- Pensez à ajouter des logs/erreurs console pour faciliter l’aide.
-
-## 📜 Licence
-Voir le fichier `LICENSE` du projet.
