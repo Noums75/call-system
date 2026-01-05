@@ -1,0 +1,12 @@
+{
+  "name": "call-system-ui",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "tsc -p web/tsconfig.json",
+    "build:watch": "tsc -p web/tsconfig.json --watch"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  }
+}

@@ -4,8 +4,8 @@ Un système d'appel d'urgence moderne et intuitif pour FiveM, permettant aux jou
 
 ## ✨ Fonctionnalités
 
-- 🎯 Menu interactif pour créer des appels d'urgence
-- 📍 Système de positionnement automatique ou manuel
+- 🎯 Menu interactif en TypeScript pour créer des appels d'urgence
+- 📍 Système de positionnement automatique
 - 🔔 Notifications en temps réel pour tous les joueurs
 - 🗺️ Création automatique de waypoint GPS
 - 📏 Calcul de distance en temps réel
@@ -15,21 +15,19 @@ Un système d'appel d'urgence moderne et intuitif pour FiveM, permettant aux jou
 
 Avant d'installer ce script, assurez-vous d'avoir les dépendances suivantes :
 
-- [ox_lib](https://github.com/overextended/ox_lib) - Bibliothèque UI et utilitaires
 - [bulletin](https://github.com/Mobius1/bulletin) - Système de notifications
 
 ## 📦 Installation
 
 1. **Téléchargez** la ressource et placez-la dans votre dossier `resources`
 
-2. **Installez les dépendances** (si ce n'est pas déjà fait) :
+2. **Installez la dépendance bulletin** (si ce n'est pas déjà fait) :
    ```bash
-   # Assurez-vous d'avoir ox_lib et bulletin dans votre dossier resources
+   # Assurez-vous d'avoir bulletin dans votre dossier resources
    ```
 
 3. **Ajoutez** la ressource à votre `server.cfg` :
    ```cfg
-   ensure ox_lib
    ensure bulletin
    ensure call-system
    ```
@@ -44,10 +42,10 @@ Avant d'installer ce script, assurez-vous d'avoir les dépendances suivantes :
 /appel
 ```
 
-Cette commande ouvre un menu interactif où vous pouvez : 
-- 📝 Saisir une description détaillée de l'incident
-- 📍 Spécifier une position (numérique) ou utiliser votre position actuelle
-- ✅ Valider et envoyer l'appel à tous les joueurs
+Cette commande ouvre le menu NUI où vous pouvez : 
+- 📝 Choisir le motif de l'urgence
+- 🙋‍♂️ Renseigner votre identité
+- 📄 Décrire la situation à transmettre
 
 ### Réception des appels
 
@@ -55,6 +53,15 @@ Lorsqu'un appel est émis :
 1. 🔔 Tous les joueurs en ligne reçoivent une notification via bulletin
 2. 📏 La distance entre le joueur et l'incident est affichée
 3. 🗺️ Appuyez sur la touche **Y** pour créer un point GPS vers l'incident
+
+## 🛠️ Construction de l'UI
+
+L'interface est écrite en TypeScript. Pour recompiler :
+
+```bash
+npm install
+npm run build
+```
 
 ## ⚙️ Configuration
 

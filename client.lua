@@ -1,74 +1,6 @@
 local bulletinIcon = 'nui://call-system/bipper.png'
 local gpsSetKey = string.upper(GetConvar('call_system_gps_key', 'Y'))
 
-local function showValidationError(message)
-    lib.notify({
-        title = 'Appel',
-        description = message,
-        type = 'error',
-        icon = bulletinIcon
-    })
-end
-
-local function openCallDialog()
-    local input = lib.inputDialog('Nouvel appel', {
-        {
-            type = 'select',
-            label = 'Type de service',
-            description = 'Sélectionnez le type de service',
-            required = true,
-            options = {
-                { value = 'gendarmerie', label = 'Gendarmerie' },
-                { value = 'police',      label = 'Police nationale' },
-                { value = 'sdis2a',      label = 'SDIS 2A – Pompiers Corse-du-Sud' },
-                { value = 'sdis2b',      label = 'SDIS 2B – Pompiers Haute-Corse' },
-                { value = 'samu2a',      label = 'SAMU 2A – Corse-du-Sud' },
-                { value = 'samu2b',      label = 'SAMU 2B – Haute-Corse' },
-                { value = 'snsm',        label = 'SNSM – Secours en mer' },
-            }
-        },
-        {
-            type = 'textarea',
-            label = 'Description',
-            description = 'Décrivez la situation',
-            required = true,
-            min = 5,
-            max = 500
-        }
-    })
-
-    if not input then
-        return
-    end
-
-    local serviceType = input[1]
-    local description = input[2]
-
-    if type(description) ~= 'string' or description == '' then
-        showValidationError('La description est obligatoire.')
-        return
-    end
-
-    -- Récupération automatique de la position du joueur
-    local ped = PlayerPedId()
-    local coords = GetEntityCoords(ped)
-
-    -- Récupération du nom de rue
-    local streetHash = GetStreetNameAtCoord(coords.x, coords.y, coords.z)
-    local streetName = GetStreetNameFromHashKey(streetHash)
-
-    TriggerServerEvent('call-system:submitCall', serviceType, description, streetName, {
-        x = coords.x,
-        y = coords.y,
-        z = coords.z
-    })
-end
-
-RegisterCommand('appel', openCallDialog)
-
-local latestCall = nil
-local activeBlip = nil
-
 local serviceLabels = {
     gendarmerie = "~b~Gendarmerie~w~",
     police      = "~b~Police nationale~w~",
@@ -79,14 +11,35 @@ local serviceLabels = {
     snsm        = "~o~SNSM~w~",
 }
 
+local allowedServices = {
+    gendarmerie = true,
+    police = true,
+    sdis2a = true,
+    sdis2b = true,
+    samu2a = true,
+    samu2b = true,
+    snsm = true,
+}
+
+local latestCall = nil
+local activeBlip = nil
+
+local function showNotification(message)
+    BeginTextCommandThefeedPost('STRING')
+    AddTextComponentString(message)
+    EndTextCommandThefeedPostTicker(false, false)
+end
+
+local function openCallDialog()
+    SetNuiFocus(true, true)
+    SendNUIMessage({ action = 'open' })
+end
+
+RegisterCommand('appel', openCallDialog)
+
 local function setCallRoute()
     if not latestCall then
-        lib.notify({
-            title = 'Appel',
-            description = 'Aucun appel actif.',
-            type = 'error',
-            icon = bulletinIcon
-        })
+        showNotification('Aucun appel actif.')
         return
     end
 
@@ -108,33 +61,68 @@ local function setCallRoute()
     AddTextComponentString('Appel')
     EndTextCommandSetBlipName(activeBlip)
 
-    lib.notify({
-        title = 'Appel',
-        description = 'Trajet GPS défini.',
-        type = 'success',
-        icon = bulletinIcon
-    })
+    showNotification('Trajet GPS défini.')
 end
 
--- Keybind uniquement, aucune commande utilisée pour définir le GPS.
-lib.addKeybind({
-    name = 'call-system:setroute',
-    description = 'Définir le trajet GPS pour le dernier appel',
-    defaultKey = gpsSetKey,
-    onPressed = setCallRoute
-})
+RegisterCommand('call-system:setroute', function()
+    setCallRoute()
+end, false)
 
-RegisterNetEvent('call-system:showAlert', function(serviceType, description, streetName, coords)
+RegisterKeyMapping('call-system:setroute', 'Définir le trajet GPS pour le dernier appel', 'keyboard', gpsSetKey)
+
+RegisterNUICallback('submitCall', function(data, cb)
+    local serviceType = tostring(data.serviceType or '')
+    local identity = tostring(data.identity or '')
+    local description = tostring(data.description or '')
+
+    if serviceType == '' or not allowedServices[serviceType] then
+        cb({ ok = false, message = 'Motif invalide.' })
+        return
+    end
+
+    if identity == '' then
+        cb({ ok = false, message = 'Votre identité est requise.' })
+        return
+    end
+
+    if description == '' then
+        cb({ ok = false, message = 'La description est obligatoire.' })
+        return
+    end
+
+    local ped = PlayerPedId()
+    local coords = GetEntityCoords(ped)
+    local streetHash = GetStreetNameAtCoord(coords.x, coords.y, coords.z)
+    local streetName = GetStreetNameFromHashKey(streetHash)
+
+    TriggerServerEvent('call-system:submitCall', serviceType, identity, description, streetName, {
+        x = coords.x,
+        y = coords.y,
+        z = coords.z
+    })
+
+    cb({ ok = true })
+    showNotification('Appel envoyé.')
+    SetNuiFocus(false, false)
+end)
+
+RegisterNUICallback('close', function(_, cb)
+    SetNuiFocus(false, false)
+    cb({})
+end)
+
+RegisterNetEvent('call-system:showAlert', function(serviceType, identity, description, streetName, coords)
     local targetCoords = vector3(coords.x, coords.y, coords.z)
     local playerCoords = GetEntityCoords(PlayerPedId())
     local distance = #(playerCoords - targetCoords)
     local distanceText = string.format('Distance : %d m', math.floor(distance))
 
     local serviceLabel = serviceLabels[serviceType] or "~b~Service~w~"
-    local message = string.format('[%s]\n%s\n%s\nPosition : %s\nAppuyez sur %s pour GPS', serviceLabel, description, distanceText, streetName, gpsSetKey)
+    local message = string.format('[%s]\n%s\nIdentité : %s\n%s\nPosition : %s\nAppuyez sur %s pour GPS', serviceLabel, description, identity, distanceText, streetName, gpsSetKey)
 
     latestCall = {
         serviceType = serviceType,
+        identity = identity,
         description = description,
         streetName = streetName,
         coords = coords

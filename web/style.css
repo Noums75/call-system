@@ -1,0 +1,120 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(36, 25, 21, 0.92), rgba(18, 12, 10, 0.92));
+  display: grid;
+  place-items: center;
+  font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif;
+  color: #f5e9dc;
+  z-index: 1000;
+}
+
+.overlay.hidden {
+  display: none;
+}
+
+.menu {
+  width: min(520px, 92vw);
+  background: linear-gradient(145deg, #2f1e18 0%, #1d130f 100%);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.55);
+  border-radius: 16px;
+  padding: 28px;
+}
+
+.menu__header {
+  margin-bottom: 20px;
+}
+
+.menu__title {
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 14px;
+  color: #c56f3b;
+  margin-bottom: 6px;
+}
+
+.menu__subtitle {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.menu__form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.field label {
+  display: block;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #d8b9a2;
+  margin-bottom: 8px;
+}
+
+.field select,
+.field input,
+.field textarea {
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.25);
+  color: #f5e9dc;
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.field select:focus,
+.field input:focus,
+.field textarea:focus {
+  border-color: #c56f3b;
+  box-shadow: 0 0 0 3px rgba(197, 111, 59, 0.18);
+}
+
+.field textarea {
+  resize: vertical;
+  min-height: 110px;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.btn {
+  background: linear-gradient(135deg, #c56f3b, #a45028);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 18px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.3);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.btn--ghost {
+  background: transparent;
+  color: #f5e9dc;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.message {
+  min-height: 18px;
+  color: #efb366;
+  font-size: 13px;
+}

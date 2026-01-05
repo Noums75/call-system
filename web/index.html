@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Call System</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <div id="app" class="overlay hidden">
+      <div class="menu">
+        <header class="menu__header">
+          <div class="menu__title">Appel d'urgence</div>
+          <div class="menu__subtitle">Renseignez les informations ci-dessous</div>
+        </header>
+        <form id="call-form" class="menu__form">
+          <div class="field">
+            <label for="service">Motif de l'urgence</label>
+            <select id="service" name="service" required></select>
+          </div>
+          <div class="field">
+            <label for="identity">Votre identité</label>
+            <input id="identity" name="identity" type="text" maxlength="60" placeholder="Nom Prénom" required />
+          </div>
+          <div class="field">
+            <label for="description">Décrivez l'urgence</label>
+            <textarea id="description" name="description" rows="4" maxlength="500" required></textarea>
+          </div>
+          <div id="message" class="message"></div>
+          <div class="actions">
+            <button type="button" id="cancel" class="btn btn--ghost">Annuler</button>
+            <button type="submit" class="btn">Envoyer</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <script type="module" src="./dist/main.js"></script>
+  </body>
+</html>

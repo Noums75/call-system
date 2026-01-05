@@ -1,5 +1,19 @@
-RegisterNetEvent('call-system:submitCall', function(serviceType, description, streetName, coords)
-    if type(serviceType) ~= 'string' or (serviceType ~= 'police' and serviceType ~= 'ems') then
+local allowedServices = {
+    gendarmerie = true,
+    police = true,
+    sdis2a = true,
+    sdis2b = true,
+    samu2a = true,
+    samu2b = true,
+    snsm = true,
+}
+
+RegisterNetEvent('call-system:submitCall', function(serviceType, identity, description, streetName, coords)
+    if type(serviceType) ~= 'string' or not allowedServices[serviceType] then
+        return
+    end
+
+    if type(identity) ~= 'string' or identity == '' then
         return
     end
 
@@ -15,9 +29,9 @@ RegisterNetEvent('call-system:submitCall', function(serviceType, description, st
         return
     end
 
-    if type(coords.x) ~= 'number' or type(coords.y) ~= 'number' or type(coords. z) ~= 'number' then
+    if type(coords.x) ~= 'number' or type(coords.y) ~= 'number' or type(coords.z) ~= 'number' then
         return
     end
 
-    TriggerClientEvent('call-system:showAlert', -1, serviceType, description, streetName, coords)
+    TriggerClientEvent('call-system:showAlert', -1, serviceType, identity, description, streetName, coords)
 end)
