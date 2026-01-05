@@ -18,8 +18,13 @@ local function openCallDialog()
             description = 'Sélectionnez le type de service',
             required = true,
             options = {
-                { value = 'police', label = "Forces de l'ordre" },
-                { value = 'ems',    label = 'Service de secours' },
+                { value = 'gendarmerie', label = 'Gendarmerie' },
+                { value = 'police',      label = 'Police nationale' },
+                { value = 'sdis2a',      label = 'SDIS 2A – Pompiers Corse-du-Sud' },
+                { value = 'sdis2b',      label = 'SDIS 2B – Pompiers Haute-Corse' },
+                { value = 'samu2a',      label = 'SAMU 2A – Corse-du-Sud' },
+                { value = 'samu2b',      label = 'SAMU 2B – Haute-Corse' },
+                { value = 'snsm',        label = 'SNSM – Secours en mer' },
             }
         },
         {
@@ -63,6 +68,16 @@ RegisterCommand('appel', openCallDialog)
 
 local latestCall = nil
 local activeBlip = nil
+
+local serviceLabels = {
+    gendarmerie = "~b~Gendarmerie~w~",
+    police      = "~b~Police nationale~w~",
+    sdis2a      = "~r~SDIS 2A~w~",
+    sdis2b      = "~r~SDIS 2B~w~",
+    samu2a      = "~r~SAMU 2A~w~",
+    samu2b      = "~r~SAMU 2B~w~",
+    snsm        = "~o~SNSM~w~",
+}
 
 local function setCallRoute()
     if not latestCall then
@@ -115,7 +130,7 @@ RegisterNetEvent('call-system:showAlert', function(serviceType, description, str
     local distance = #(playerCoords - targetCoords)
     local distanceText = string.format('Distance : %d m', math.floor(distance))
 
-    local serviceLabel = serviceType == 'police' and "~b~Forces de l'ordre~w~" or "~r~Service de secours~w~"
+    local serviceLabel = serviceLabels[serviceType] or "~b~Service~w~"
     local message = string.format('[%s]\n%s\n%s\nPosition : %s\nAppuyez sur %s pour GPS', serviceLabel, description, distanceText, streetName, gpsSetKey)
 
     latestCall = {
