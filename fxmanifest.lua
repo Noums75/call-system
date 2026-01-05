@@ -6,13 +6,15 @@ lua54 'yes'
 client_script 'client.lua'
 server_script 'server.lua'
 
-shared_script '@ox_lib/init.lua'
+ui_page 'web/index.html'
 
 files {
-    'bipper.png'
+    'bipper.png',
+    'web/index.html',
+    'web/style.css',
+    'web/dist/main.js'
 }
 
 dependencies {
-    'ox_lib',
     'bulletin'
 }
